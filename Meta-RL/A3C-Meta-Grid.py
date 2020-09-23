@@ -222,7 +222,7 @@ class Worker():
                 if episode_count % 50 == 0 and episode_count != 0:
                     if episode_count % 500 == 0 and self.name == 'worker_0' and train == True:
                         saver.save(sess,self.model_path + '/model-' + str(episode_count) + '.cptk')
-                        print("Saved Model")
+                        print("Saved Model-%d" % (episode_count))
 
                     if self.name == 'worker_0' and episode_count % 50 == 0:
                         time_per_step = 0.25
@@ -255,8 +255,8 @@ class Worker():
 
 gamma = .95 # discount rate for advantage estimation and reward discounting
 a_size = 4 
-load_model = True
-train = False
+load_model = False
+train = True
 model_path = './model_meta_grid'
 
 tf.reset_default_graph()

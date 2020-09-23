@@ -236,7 +236,7 @@ class Worker():
                     r, d, t = self.env.pullArm(a)                        
                     episode_buffer.append([a, r, t, d, v[0, 0]])
                     episode_values.append(v[0, 0])
-                    episode_frames.append(set_image_bandit(episode_reward, self.env.bandit, a, t))
+                    # episode_frames.append(set_image_bandit(episode_reward, self.env.bandit, a, t))
                     episode_reward[a] += r
                     total_steps += 1
                     episode_step_count += 1

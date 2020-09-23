@@ -173,7 +173,7 @@ class Worker():
         # Generate network statistics to periodically save
         rnn_state = self.local_AC.state_init
         feed_dict = {self.local_AC.target_v:discounted_rewards,
-            self.local_AC.state:np.stack(states,axis=0),
+            self.local_AC.state:np.stack(states, axis=0),
             self.local_AC.prev_rewards:np.vstack(prev_rewards),
             self.local_AC.prev_actions:prev_actions,
             self.local_AC.actions:actions,
@@ -181,7 +181,7 @@ class Worker():
             self.local_AC.advantages:advantages,
             self.local_AC.state_in[0]:rnn_state[0],
             self.local_AC.state_in[1]:rnn_state[1]}
-        v_l,p_l,e_l,g_n,v_n,_ = sess.run([self.local_AC.value_loss,
+        v_l, p_l, e_l, g_n, v_n, _ = sess.run([self.local_AC.value_loss,
             self.local_AC.policy_loss,
             self.local_AC.entropy,
             self.local_AC.grad_norms,
@@ -227,7 +227,7 @@ class Worker():
                     s1, r, d, t = self.env.pullArm(a)                        
                     episode_buffer.append([s, a, r, t, d, v[0, 0]])
                     episode_values.append(v[0, 0])
-                    episode_frames.append(set_image_context(self.env.true, s, episode_reward, a, t))
+                    # episode_frames.append(set_image_context(self.env.true, s, episode_reward, a, t))
                     episode_reward += r
                     total_steps += 1
                     episode_step_count += 1
@@ -246,12 +246,12 @@ class Worker():
                 if episode_count % 20 == 0 and episode_count != 0:
                     if episode_count % 500 == 0 and self.name == 'worker_0' and train == True and len(self.episode_rewards) != 0:
                         saver.save(sess, self.model_path + '/model-' + str(episode_count) + '.cptk')
-                        print("Saved Model")
+                        print("Saved Model-%d" % (episode_count))
                         
-                    if episode_count % 40 == 0 and self.name == 'worker_0':
-                        self.images = np.array(episode_frames)
-                        make_gif(self.images, './frames/image' + str(episode_count) + '.gif',
-                            duration=len(self.images) * 0.1, true_image=True)
+                    # if episode_count % 40 == 0 and self.name == 'worker_0':
+                    #     self.images = np.array(episode_frames)
+                    #     make_gif(self.images, './frames/image' + str(episode_count) + '.gif',
+                    #         duration=len(self.images) * 0.1, true_image=True)
 
                     mean_reward = np.mean(self.episode_rewards[-10:])
                     mean_length = np.mean(self.episode_lengths[-10:])
@@ -279,8 +279,8 @@ class Worker():
 
 gamma = .8 # discount rate for advantage estimation and reward discounting
 a_size = 2 
-load_model = True
-train = False
+load_model = False
+train = True
 model_path = './model_meta_context'
 
 tf.reset_default_graph()
@@ -300,8 +300,8 @@ with tf.device("/cpu:0"):
     global_episodes = tf.Variable(0, dtype=tf.int32, name='global_episodes', trainable=False)
     trainer = tf.train.AdamOptimizer(learning_rate=1e-3)
     master_network = AC_Network(a_size, 'global', None) # Generate global network
-    num_workers = multiprocessing.cpu_count() # Set workers ot number of available CPU threads
-    # num_workers = 1
+    # num_workers = multiprocessing.cpu_count() # Set workers ot number of available CPU threads
+    num_workers = 1
     workers = []
     # Create worker classes
     for i in range(num_workers):
