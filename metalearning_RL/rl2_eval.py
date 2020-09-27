@@ -142,6 +142,8 @@ def main():
 
     tasks = gym.make(eval_env_name).unwrapped.sample_tasks(args.num_eval_tasks)
 
+    # print([task['mean'].max() for task in tasks])
+
     num_workers = mp.cpu_count() - 1
     if args.num_workers is not None:
         num_workers = args.num_workers
