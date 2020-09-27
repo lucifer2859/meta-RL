@@ -31,7 +31,7 @@ class DenseBlock(nn.Module):
         # input is dimensions (N, in_channels, T)
         xf = self.causalconv1(input)
         xg = self.causalconv2(input)
-        activations = F.tanh(xf) * F.sigmoid(xg)  # shape: (N, filters, T)
+        activations = torch.tanh(xf) * torch.sigmoid(xg)  # shape: (N, filters, T)
         return torch.cat((input, activations), dim=1)
 
 
@@ -46,6 +46,7 @@ class TCBlock(nn.Module):
         input = torch.transpose(input, 1, 2)
         for block in self.dense_blocks:
             input = block(input)
+
         return torch.transpose(input, 1, 2)
 
 
@@ -72,4 +73,5 @@ class AttentionBlock(nn.Module):
         probs = F.softmax(logits / self.sqrt_key_size,
                           dim=1)  # shape: (N, T, T), broadcasting over any slice [:, x, :], each row of the matrix
         read = torch.bmm(probs, values)  # shape: (N, T, value_size)
+
         return torch.cat((input, read), dim=2)  # shape: (N, T, in_channels + value_size)

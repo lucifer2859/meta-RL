@@ -243,12 +243,12 @@ class Worker():
             
                     
                 # Periodically save gifs of episodes, model parameters, and summary statistics.
-                if episode_count % 20 == 0 and episode_count != 0:
-                    if episode_count % 500 == 0 and self.name == 'worker_0' and train == True and len(self.episode_rewards) != 0:
+                if episode_count % 500 == 0 and episode_count != 0:
+                    if episode_count % 2000 == 0 and self.name == 'worker_0' and train == True and len(self.episode_rewards) != 0:
                         saver.save(sess, self.model_path + '/model-' + str(episode_count) + '.cptk')
                         print("Saved Model-%d" % (episode_count))
                         
-                    # if episode_count % 40 == 0 and self.name == 'worker_0':
+                    # if episode_count % 1000 == 0 and self.name == 'worker_0':
                     #     self.images = np.array(episode_frames)
                     #     make_gif(self.images, './frames/image' + str(episode_count) + '.gif',
                     #         duration=len(self.images) * 0.1, true_image=True)

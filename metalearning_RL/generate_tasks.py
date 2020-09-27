@@ -19,23 +19,23 @@ result_folder = './tasks'
 out_result = '{}/{}_{}_{}.pkl'.format(result_folder, args.task, args.num_actions, args.num_tasks)
 
 def generate_experiment_tasks(num_tasks):
-  env = gym.make(task)
-  return env.unwrapped.sample_tasks(num_tasks)
+    env = gym.make(task)
+    return env.unwrapped.sample_tasks(num_tasks)
 
 if __name__ == "__main__":
-  task = ''
-  if args.task == 'bandit':
-    task = "Bandit-K{}-v0".format(args.num_actions)
-  elif args.task == 'mdp':
-    task = "TabularMDP-v0"
-  else:
-    print('Invalid Task')
-    exit
+    task = ''
+    if args.task == 'bandit':
+        task = "Bandit-K{}-v0".format(args.num_actions)
+    elif args.task == 'mdp':
+        task = "TabularMDP-v0"
+    else:
+        print('Invalid Task')
+        exit
 
-  tasks = generate_experiment_tasks(args.num_tasks)
-  print(tasks)
-  if not os.path.exists(result_folder):
-    os.makedirs(result_folder)
+    tasks = generate_experiment_tasks(args.num_tasks)
+    print(tasks)
+    if not os.path.exists(result_folder):
+        os.makedirs(result_folder)
 
-  with open(out_result, 'wb') as f:
-    pickle.dump([tasks], f)
+    with open(out_result, 'wb') as f:
+        pickle.dump([tasks], f)

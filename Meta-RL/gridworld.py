@@ -77,11 +77,11 @@ class gameEnv():
         
             if direction == 0 and hero.y >= 1 and [hero.x, hero.y - 1] not in blockPositions.tolist():
                 hero.y -= 1
-            if direction == 1 and hero.y <= self.sizeY-2 and [hero.x, hero.y + 1] not in blockPositions.tolist():
+            if direction == 1 and hero.y <= self.sizeY - 2 and [hero.x, hero.y + 1] not in blockPositions.tolist():
                 hero.y += 1
             if direction == 2 and hero.x >= 1 and [hero.x - 1, hero.y] not in blockPositions.tolist():
                 hero.x -= 1
-            if direction == 3 and hero.x <= self.sizeX-2 and [hero.x + 1, hero.y] not in blockPositions.tolist():
+            if direction == 3 and hero.x <= self.sizeX - 2 and [hero.x + 1, hero.y] not in blockPositions.tolist():
                 hero.x += 1     
         if hero.x == heroX and hero.y == heroY:
             penalize = 0.0
@@ -89,7 +89,7 @@ class gameEnv():
         return penalize
     
     def newPosition(self, sparcity):
-        iterables = [ range(self.sizeX), range(self.sizeY)]
+        iterables = [range(self.sizeX), range(self.sizeY)]
         points = []
         for t in itertools.product(*iterables):
             points.append(t)
@@ -107,10 +107,10 @@ class gameEnv():
                 self.objects.remove(other)
                 if other.reward == 1:
                     self.objects.append(gameOb(self.newPosition(0), 1, self.goal_color, 1, 'goal'))
-                    return other.reward,False
+                    return other.reward, False
                 else: 
                     self.objects.append(gameOb(self.newPosition(0), 1, self.other_color, 0, 'fire'))
-                    return other.reward,False
+                    return other.reward, False
         if ended == False:
             return 0.0, False
 
@@ -126,7 +126,7 @@ class gameEnv():
             a += np.dstack([self.bg, self.bg, self.bg])
         hero = self.objects[0]
         for item in self.objects:
-            a[item.y + padding:item.y + item.size + padding, item.x + padding:item.x + item.size + padding,:] = item.color
+            a[item.y + padding:item.y + item.size + padding, item.x + padding:item.x + item.size + padding, :] = item.color
             # if item.name == 'hero':
             #     hero = item
         if self.partial == True:

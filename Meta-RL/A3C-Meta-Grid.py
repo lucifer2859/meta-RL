@@ -170,7 +170,7 @@ class Worker():
                 sess.run(self.update_local_ops)
                 episode_buffer = []
                 episode_values = []
-                episode_frames = []
+                # episode_frames = []
                 episode_reward = 0
                 episode_step_count = 0
                 d = False
@@ -200,7 +200,7 @@ class Worker():
                     episode_buffer.append([s, a, r, t, d, v[0, 0]])
                     episode_values.append(v[0, 0])
                     episode_reward += r
-                    episode_frames.append(set_image_gridworld(s1_big, reward_color, episode_reward, t))
+                    # episode_frames.append(set_image_gridworld(s1_big, reward_color, episode_reward, t))
                     total_steps += 1
                     t += 1
                     episode_step_count += 1
@@ -219,16 +219,16 @@ class Worker():
             
                     
                 # Periodically save gifs of episodes, model parameters, and summary statistics.
-                if episode_count % 50 == 0 and episode_count != 0:
-                    if episode_count % 500 == 0 and self.name == 'worker_0' and train == True:
+                if episode_count % 250 == 0 and episode_count != 0:
+                    if episode_count % 1000 == 0 and self.name == 'worker_0' and train == True:
                         saver.save(sess,self.model_path + '/model-' + str(episode_count) + '.cptk')
                         print("Saved Model-%d" % (episode_count))
 
-                    if self.name == 'worker_0' and episode_count % 50 == 0:
-                        time_per_step = 0.25
-                        self.images = np.array(episode_frames)
-                        make_gif(self.images, './frames/image' + str(episode_count) + '.gif',
-                            duration=len(self.images) * time_per_step, true_image=True)
+                    # if self.name == 'worker_0' and episode_count % 250 == 0:
+                    #     time_per_step = 0.25
+                    #     self.images = np.array(episode_frames)
+                    #     make_gif(self.images, './frames/image' + str(episode_count) + '.gif',
+                    #         duration=len(self.images) * time_per_step, true_image=True)
 
                         
                     mean_reward = np.mean(self.episode_rewards[-50:])
@@ -276,7 +276,8 @@ with tf.device("/cpu:0"):
     global_episodes = tf.Variable(0, dtype=tf.int32, name='global_episodes', trainable=False)
     trainer = tf.train.AdamOptimizer(learning_rate=1e-3)
     master_network = AC_Network(a_size, 'global', None) # Generate global network
-    num_workers = multiprocessing.cpu_count() # Set workers ot number of available CPU threads
+    # num_workers = multiprocessing.cpu_count() # Set workers ot number of available CPU threads
+    num_workers = 1
     workers = []
     # Create worker classes
     for i in range(num_workers):
@@ -300,4 +301,3 @@ with tf.Session() as sess:
         thread.start()
         worker_threads.append(thread)
     coord.join(worker_threads)
-
