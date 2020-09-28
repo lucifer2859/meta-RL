@@ -13,8 +13,9 @@ import torch
 
 from helper.evaluate_model import evaluate_multiple_tasks, sample_multiple_random_fixed_length
 
-# 1. python generate_tasks.py
-# 2. python rl2_eval.py --task bandit --algo ppo --num_actions 5 --num_tasks 100 --num_traj 50 --traj_len 1 --num_workers 1 --models_dir test_bandit --eval_tasks tasks/bandit_5_100.pkl --out_file eval
+import gym
+
+# python rl2_eval_modified.py --task bandit --algo ppo --num_actions 5 --num_tasks 100 --num_traj 50 --traj_len 1 --num_workers 1 --models_dir test_bandit --eval_task bandit --num_eval_tasks 100 --out_file eval
 
 parser = argparse.ArgumentParser(description='Evaluate model on specified task')
 
@@ -31,7 +32,8 @@ parser.add_argument('--num_workers', type=int, help='number of workers to perfor
 parser.add_argument('--skip', type=int, default=5, help='number of updates to skip before next evaluation (default: 5)')
 
 parser.add_argument('--models_dir', help='the directory of the models to evaluate. models are retrieved in increasing order based on number prefix')
-parser.add_argument('--eval_tasks', help='the tasks to evaluate on')
+parser.add_argument('--eval_task', help='the task to evaluate on [bandit, mdp]')
+parser.add_argument('--num_eval_tasks', type=int, default=100, help='number of similar tasks to eval (default: 100)')
 parser.add_argument('--out_file', help='the prefix of the filename to save outputs')
 
 args = parser.parse_args()
@@ -94,8 +96,8 @@ def generate_plot(out_file_prefix, is_random=False):
     models_avg_rewards = np.average(all_rewards_matrix, axis=1)
     models_std_rewards = np.std(all_rewards_matrix, axis=1)
   
-    print(models_avg_rewards)
-    print(models_std_rewards)
+    print('Rewards (avg): ', models_avg_rewards)
+    print('Rewards (std): ', models_std_rewards)
 
     x_range = list(range(len(all_rewards))) if is_random else list(map(lambda x: get_file_number(x) + 1, eval_models))
     plt.plot(x_range, models_avg_rewards)
@@ -115,7 +117,7 @@ def get_file_number(filename):
 def main():
     print("TESTING MODEL ========================================================================")
     assert args.out_file, 'Missing output file'
-    assert args.eval_tasks, 'Missing tasks'
+    assert args.eval_task, 'Missing tasks'
     assert args.num_fake_update > 0, 'Needs to have at least 1 update'
     assert args.skip >= 0, 'the amount of skipping should be at least 0'
     assert args.num_workers is None or args.num_workers > 0, 'Needs to have at least 1 worker'
@@ -132,8 +134,17 @@ def main():
         num_actions = 5
         num_states = 10
 
-    with open(args.eval_tasks, 'rb') as f:
-        tasks = pickle.load(f)[0]
+    # with open(args.eval_tasks, 'rb') as f:
+    #     tasks = pickle.load(f)[0]
+
+    if args.eval_task == 'bandit':
+        eval_env_name = "Bandit-K{}-v0".format(args.num_actions)
+    elif args.eval_task == 'mdp':
+        eval_env_name = "TabularMDP-v0"
+
+    tasks = gym.make(eval_env_name).unwrapped.sample_tasks(args.num_eval_tasks)
+
+    # print([task['mean'].max() for task in tasks])
 
     num_workers = mp.cpu_count() - 1
     if args.num_workers is not None:
